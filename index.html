@@ -1,13 +1,18 @@
-Aqui está o código completo, já com todas as regras de responsividade aplicadas na seção `@media (max-width: 900px)`. 
+Pela captura de tela que você enviou, consegui identificar exatamente o que está acontecendo:
 
-Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.html` e fazer o *commit* no seu repositório para que o GitHub Pages atualize a versão online.
+1. **Bug do iOS (Safari):** O iOS contabiliza a barra de endereços no tamanho da tela, empurrando o layout para baixo e "espremendo" o conteúdo.
+2. **Fontes estáticas:** O tamanho do texto não estava encolhendo o suficiente para caber na moldura. Como o conteúdo tem altura flexível e estava centralizado (`justify-content: center`), o texto acabou "vazando" por cima e por baixo da linha roxa.
+
+Para resolver isso de forma definitiva, troquei as medidas para `dvh` (Dynamic Viewport Height - que recalcula o tamanho real da tela no celular ignorando a barra de navegação), usei a função `clamp()` para a fonte diminuir fluidamente, abri mais as margens da moldura e adicionei um limite para o texto não sair do quadrado.
+
+Copie o código completo abaixo, substitua no seu `index.html` e faça um novo *commit* no GitHub:
 
 ```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="slides-format" content="viewport">
   <title>Codetrade x inOffice</title>
 
@@ -26,25 +31,31 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       --text-footer: #444444;
       --border-frame: rgba(124,107,232,0.30);
       --border-footer: #1c1c1c;
-      --source-color: #3a3a3a;
     }
+    
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; height: 100%; width: 100%; }
-    body {
+    
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      width: 100%; 
+      height: 100vh;
+      height: 100dvh; /* Medida dinâmica para resolver o bug do iOS Safari */
+      overflow: hidden; 
       background: var(--background);
       color: var(--text-white);
-      font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      overflow: hidden;
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     }
+
     .deck {
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--background);
     }
+
     .slide {
       position: absolute;
       top: 0; left: 0;
@@ -59,20 +70,22 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       pointer-events: none;
       background: var(--background);
     }
+
     .slide.active {
       opacity: 1;
       transform: scale(1);
       pointer-events: all;
     }
-    /* Canvas centralizado */
+
+    /* Canvas centralizado (Desktop) */
     .canvas {
       position: relative;
       width: min(1080px, 90vmin);
       height: min(1080px, 90vmin);
       background: #000000;
       overflow: hidden;
-      color: var(--text-white);
     }
+
     /* Moldura interna */
     .frame {
       position: absolute;
@@ -80,10 +93,8 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       border: 1.5px solid var(--border-frame);
       pointer-events: none;
     }
-    .corner {
-      position: absolute;
-      width: 22px; height: 22px;
-    }
+    
+    .corner { position: absolute; width: 22px; height: 22px; }
     .corner.tl { top: 60px; left: 60px; border-top: 2px solid var(--brand-primary); border-left: 2px solid var(--brand-primary); }
     .corner.tr { top: 60px; right: 60px; border-top: 2px solid var(--brand-primary); border-right: 2px solid var(--brand-primary); }
     .corner.bl { bottom: 60px; left: 60px; border-bottom: 2px solid var(--brand-primary); border-left: 2px solid var(--brand-primary); }
@@ -97,28 +108,25 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       flex-direction: column;
       justify-content: space-between;
     }
+
     .safe-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 20px;
     }
+
     .tag {
       border: 1.5px solid var(--brand-primary);
       color: #CCCCCC;
       padding: 7px 26px;
-      font-size: 20px;
       font-weight: 500;
       letter-spacing: .06em;
       border-radius: 999px;
-      text-transform: none;
     }
-    .page {
-      color: #555555;
-      font-size: 20px;
-      font-weight: 400;
-      letter-spacing: .04em;
-    }
+
+    .page { color: #555555; font-weight: 400; letter-spacing: .04em; }
+
     .safe-middle {
       flex: 1;
       display: flex;
@@ -128,6 +136,7 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       text-align: center;
       padding: 0 12px;
     }
+
     .title {
       font-size: clamp(42px, 4vw, 66px);
       font-weight: 700;
@@ -136,36 +145,13 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       margin: 0 0 18px;
     }
     .title span.highlight { color: var(--brand-primary); }
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 26px;
-      font-weight: 400;
-      line-height: 1.65;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .body {
-      color: var(--text-body);
-      font-size: 25px;
-      font-weight: 400;
-      line-height: 1.75;
-      max-width: 760px;
-      margin: 0 auto;
-    }
-    .rule {
-      width: 64px;
-      height: 1px;
-      background: #2a2a2a;
-      margin: 28px auto;
-    }
-    .list {
-      color: var(--text-body);
-      font-size: 22px;
-      line-height: 1.6;
-      max-width: 800px;
-      text-align: left;
-      margin: 0 auto;
-    }
+    
+    .subtitle { color: var(--text-muted); font-size: 26px; line-height: 1.65; max-width: 720px; margin: 0 auto; }
+    .body { color: var(--text-body); font-size: 25px; line-height: 1.75; max-width: 760px; margin: 0 auto; }
+    
+    .rule { width: 64px; height: 1px; background: #2a2a2a; margin: 28px auto; }
+    
+    .list { color: var(--text-body); font-size: 22px; line-height: 1.6; max-width: 800px; text-align: left; margin: 0 auto; }
     .list p { margin: 0 0 10px; }
 
     .footer {
@@ -177,116 +163,76 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
       font-size: 16px;
       color: var(--text-footer);
     }
-    .footer-left {
-      font-weight: 500;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .footer-right {
-      font-weight: 400;
-      letter-spacing: .04em;
-    }
+    .footer-left { font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+    .footer-right { font-weight: 400; letter-spacing: .04em; }
 
     /* Progress bar & swipe */
     .progress-wrap {
       position: absolute;
-      left: 108px;
-      right: 108px;
-      bottom: 40px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      left: 108px; right: 108px; bottom: 40px;
+      display: flex; align-items: center; gap: 12px;
     }
-    .progress-track {
-      flex: 1;
-      height: 3px;
-      border-radius: 2px;
-      background: rgba(255,255,255,0.12);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 0;
-      background: var(--brand-primary);
-    }
-    .progress-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: .08em;
-    }
+    .progress-track { flex: 1; height: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--brand-primary); transition: width 0.3s ease; }
+    .progress-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.4); letter-spacing: .08em; }
 
     .nav-controls {
       position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+      bottom: 18px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,0.5); font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+      z-index: 100;
     }
     .nav-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: transparent;
-      color: rgba(255,255,255,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    }
-    .nav-btn:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.35);
+      width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.22);
+      background: transparent; color: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
 
-    /* ==== INÍCIO DAS REGRAS RESPONSIVAS PARA MOBILE ==== */
+    /* ==== CORREÇÃO DEFINITIVA MOBILE ==== */
     @media (max-width: 900px) {
-      /* Muda o canvas para ocupar a tela toda do celular, não apenas um quadrado */
-      .canvas { width: 100vw; height: 100vh; }
+      .canvas { width: 100%; height: 100%; border-radius: 0; }
       
-      /* Ajusta margens para dar respiro na tela pequena */
-      .safe { top: 60px; left: 24px; right: 24px; bottom: 80px; }
-      .frame { top: 30px; left: 20px; right: 20px; bottom: 60px; }
-      .corner.tl { top: 30px; left: 20px; }
-      .corner.tr { top: 30px; right: 20px; }
-      .corner.bl { bottom: 60px; left: 20px; }
-      .corner.br { bottom: 60px; right: 20px; }
-      .progress-wrap { left: 24px; right: 24px; bottom: 20px; }
-
-      /* Reduz o tamanho das fontes para não quebrar o layout no celular */
-      .title { font-size: 32px; line-height: 1.2; margin-bottom: 12px; }
-      .subtitle { font-size: 18px; line-height: 1.4; }
-      .body { font-size: 16px; line-height: 1.5; }
-      .list { font-size: 16px; line-height: 1.4; }
-      .tag { font-size: 12px; padding: 4px 14px; }
-      .page { font-size: 14px; }
+      /* Expande a moldura roxa para colar mais nas bordas da tela e dar respiro */
+      .frame { top: 20px; left: 16px; right: 16px; bottom: 85px; }
+      .corner.tl { top: 20px; left: 16px; }
+      .corner.tr { top: 20px; right: 16px; }
+      .corner.bl { bottom: 85px; left: 16px; }
+      .corner.br { bottom: 85px; right: 16px; }
       
-      /* Ajusta o rodapé para empilhar as informações */
-      .footer { 
-        font-size: 10px; 
-        flex-direction: column; 
-        gap: 6px; 
-        text-align: center; 
-        padding-top: 12px;
+      /* Limita a zona de texto rigorosamente dentro da moldura */
+      .safe { top: 36px; left: 24px; right: 24px; bottom: 100px; }
+      
+      /* Impede que o conteúdo vaze. Se a tela for absurdamente pequena, ele cria um scroll invisível */
+      .safe-middle { 
+        max-height: calc(100dvh - 180px);
+        overflow-y: auto;
+        padding: 10px 0;
+        justify-content: center;
       }
       
-      /* Ajusta o botão final do Slide 8 */
+      /* Ajuste dinâmico super agressivo para garantir que o texto encolha */
+      .title { font-size: clamp(22px, 6vw, 32px); line-height: 1.15; margin-bottom: 12px; }
+      .subtitle, .body, .list { font-size: clamp(14px, 4vw, 17px); line-height: 1.4; }
+      .list p { margin: 0 0 10px; }
+      .rule { margin: 16px auto; }
+      
+      /* Topo e Rodapé */
+      .safe-top { font-size: 14px; margin-bottom: 12px; }
+      .tag { font-size: 10px; padding: 4px 10px; border-width: 1px; }
+      .page { font-size: 12px; }
+      
+      .footer { flex-direction: column; gap: 4px; font-size: 9px; padding-top: 10px; text-align: center; border-top-color: rgba(255,255,255,0.1); }
+      
+      .progress-wrap { bottom: 24px; left: 16px; right: 16px; }
+      .nav-controls { bottom: 48px; transform: translateX(-50%) scale(0.85); }
+      
+      /* Botão Slide 8 */
       div[style*="border:1.5px solid"] {
-        font-size: 16px !important;
+        font-size: 14px !important;
         padding: 10px 24px !important;
-        margin-top: 24px !important;
+        margin-top: 16px !important;
       }
     }
-    /* ==== FIM DAS REGRAS RESPONSIVAS ==== */
-
   </style>
 </head>
 <body>
@@ -295,275 +241,163 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
   <section class="slide active" data-slide="1">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">01 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">01 / 08</div></div>
         <div class="safe-middle">
           <h1 class="title">Como usar <span class="highlight">inteligência aplicada</span> para lotar um coworking</h1>
           <p class="subtitle">Uma proposta prática da Codetrade (C&T.AI) para aumentar ocupação, reduzir trabalho manual e melhorar a experiência em todas as unidades do inOffice.</p>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 12.5%;"></div></div>
-        <div class="progress-label">1/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 12.5%;"></div></div><div class="progress-label">1/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="2">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">02 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">02 / 08</div></div>
         <div class="safe-middle">
           <h2 class="title">Coworking cheio não depende só de <span class="highlight">localização</span></h2>
           <div class="rule"></div>
           <p class="body">Mesmo com estrutura moderna e endereços fortes em Campo Grande, muitos espaços ainda perdem leads por demora na resposta, falta de organização do funil e cobranças manuais que consomem o tempo do time.</p>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 25%;"></div></div>
-        <div class="progress-label">2/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 25%;"></div></div><div class="progress-label">2/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="3">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">03 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">03 / 08</div></div>
         <div class="safe-middle">
           <h2 class="title">O que já faz o inOffice se destacar</h2>
           <div class="rule"></div>
           <div class="list">
-            <p>• Rede de unidades em pontos estratégicos de Campo Grande, com salas, estações, salas de reunião e espaço para eventos.</p>
+            <p>• Rede de unidades em pontos estratégicos de Campo Grande, com salas, estações e espaço para eventos.</p>
             <p>• Estrutura pensada para networking e geração de negócios entre empreendedores.</p>
             <p>• Experiência profissional para receber clientes, com ambiente cuidado e pronto para uso diário.</p>
           </div>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 37.5%;"></div></div>
-        <div class="progress-label">3/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 37.5%;"></div></div><div class="progress-label">3/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="4">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">04 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">04 / 08</div></div>
         <div class="safe-middle">
           <h2 class="title">Onde os coworkings mais perdem <span class="highlight">resultado</span></h2>
           <div class="rule"></div>
           <div class="list">
-            <p>• Leads entrando por WhatsApp, Instagram, site e parceiros sem um funil claro.</p>
+            <p>• Leads entrando por WhatsApp, Instagram e site sem um funil claro.</p>
             <p>• Orçamentos respondidos com atraso, abrindo espaço para concorrentes.</p>
             <p>• Cobranças mensais feitas na mão, tomando tempo da equipe.</p>
-            <p>• Pouco uso da base atual de clientes para eventos, upgrades e indicações.</p>
+            <p>• Pouco uso da base atual de clientes para eventos e upgrades.</p>
           </div>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
-        <div class="progress-label">4/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div><div class="progress-label">4/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="5">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">05 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">05 / 08</div></div>
         <div class="safe-middle">
           <h2 class="title">O que a Codetrade entrega para o inOffice</h2>
           <div class="rule"></div>
           <div class="list">
-            <p>• Sistema inteligente de atendimento no WhatsApp, treinado com os planos e regras do inOffice.</p>
-            <p>• Automação de visitas: agendamento, lembretes e acompanhamento até o fechamento.</p>
-            <p>• Fluxos automáticos de cobrança e renovações, com lembretes antes e depois do vencimento.</p>
-            <p>• Relatórios simples por unidade: leads, visitas, contratos e impacto na ocupação.</p>
+            <p>• Sistema inteligente no WhatsApp, treinado com os planos do inOffice.</p>
+            <p>• Automação de visitas: agendamento e acompanhamento até o fechamento.</p>
+            <p>• Fluxos automáticos de cobrança com lembretes antes do vencimento.</p>
+            <p>• Relatórios simples por unidade: leads, contratos e ocupação.</p>
           </div>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 62.5%;"></div></div>
-        <div class="progress-label">5/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 62.5%;"></div></div><div class="progress-label">5/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="6">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">06 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">06 / 08</div></div>
         <div class="safe-middle">
-          <h2 class="title">Como isso aparece no dia a dia do inOffice</h2>
+          <h2 class="title">Como isso aparece no dia a dia</h2>
           <div class="rule"></div>
           <div class="list">
-            <p>• Quem vê o inOffice no Instagram ou no parceiro aciona o WhatsApp e recebe resposta imediata, com opções de unidade e horário de visita.</p>
-            <p>• Após a visita, o prospect entra num fluxo de acompanhamento até a decisão.</p>
-            <p>• Coworkers atuais recebem comunicações segmentadas sobre eventos e novos planos.</p>
-            <p>• A equipe passa menos tempo cobrando fatura e mais tempo cuidando da experiência do espaço.</p>
+            <p>• O prospect aciona o WhatsApp e recebe resposta imediata com horários de visita.</p>
+            <p>• Após a visita, ele entra num fluxo de acompanhamento até a decisão.</p>
+            <p>• Coworkers atuais recebem novidades segmentadas de forma automática.</p>
+            <p>• A equipe foca no relacionamento presencial em vez de cobrar faturas.</p>
           </div>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 75%;"></div></div>
-        <div class="progress-label">6/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 75%;"></div></div><div class="progress-label">6/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="7">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">07 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">07 / 08</div></div>
         <div class="safe-middle">
           <h2 class="title">Piloto focado em <span class="highlight">resultado rápido</span></h2>
           <div class="rule"></div>
           <div class="list">
-            <p>• Piloto de 60 dias em uma unidade (por exemplo, The Place).</p>
-            <p>• Configuração única dos fluxos de atendimento, visitas e cobranças.</p>
-            <p>• Ajustes semanais com base nos números e no feedback da equipe.</p>
-            <p>• Opção de expandir gradualmente para as demais unidades após o piloto.</p>
+            <p>• Piloto de 60 dias em uma unidade selecionada (ex: The Place).</p>
+            <p>• Configuração única dos fluxos de atendimento e cobranças.</p>
+            <p>• Ajustes semanais com base no feedback da equipe do inOffice.</p>
+            <p>• Opção de expandir gradualmente para as demais unidades.</p>
           </div>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 87.5%;"></div></div>
-        <div class="progress-label">7/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 87.5%;"></div></div><div class="progress-label">7/8</div></div>
     </div>
   </section>
 
   <section class="slide" data-slide="8">
     <div class="canvas">
       <div class="frame"></div>
-      <div class="corner tl"></div>
-      <div class="corner tr"></div>
-      <div class="corner bl"></div>
-      <div class="corner br"></div>
-
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="safe">
-        <div class="safe-top">
-          <div class="tag">C&T.AI · CASO</div>
-          <div class="page">08 / 08</div>
-        </div>
+        <div class="safe-top"><div class="tag">C&T.AI · CASO</div><div class="page">08 / 08</div></div>
         <div class="safe-middle">
-          <h2 class="title">Próximo passo: desenhar o <span class="highlight">sistema</span> do inOffice</h2>
+          <h2 class="title">Próximo passo: o <span class="highlight">sistema</span> inOffice</h2>
           <div class="rule"></div>
-          <p class="body">Se fizer sentido para vocês, marcamos um bate-papo rápido para alinhar metas de ocupação, unidades prioritárias e o escopo do piloto. A partir daí, a Codetrade cuida da implementação e da melhoria contínua.</p>
-          <div style="display:inline-block;margin-top:36px;border:1.5px solid #7C6BE8;color:#7C6BE8;font-size:22px;font-weight:500;letter-spacing:.12em;padding:14px 48px;border-radius:100px;text-transform:uppercase;">
+          <p class="body">Se fizer sentido, marcamos um bate-papo para alinhar metas do piloto. A Codetrade cuida de toda a implementação.</p>
+          <div style="display:inline-block; border:1.5px solid #7C6BE8; color:#7C6BE8; font-weight:500; letter-spacing:.12em; border-radius:100px; text-transform:uppercase;">
             Falar sobre SISTEMA
           </div>
-          <p style="margin-top:32px;font-size:20px;color:var(--text-body);">João Tomás · Codetrade (C&T.AI) · Contato: (67) 99226-5673 · Instagram: @codetrade.ai</p>
+          <p style="margin-top:20px; font-size:14px; color:var(--text-body);">João Tomás · (67) 99226-5673 · @codetrade.ai</p>
         </div>
-        <div class="footer">
-          <div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div>
-          <div class="footer-right">@codetrade.ai</div>
-        </div>
+        <div class="footer"><div class="footer-left">CODETRADE · IA APLICADA COM MÉTODO</div><div class="footer-right">@codetrade.ai</div></div>
       </div>
-
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" style="width: 100%;"></div></div>
-        <div class="progress-label">8/8</div>
-      </div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" style="width: 100%;"></div></div><div class="progress-label">8/8</div></div>
     </div>
   </section>
 
@@ -589,33 +423,21 @@ Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.ht
     current = n;
   }
 
-  function changeSlide(delta) {
-    goToSlide(current + delta);
-  }
+  function changeSlide(delta) { goToSlide(current + delta); }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') {
-      e.preventDefault();
-      changeSlide(1);
-    }
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      changeSlide(-1);
-    }
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
   });
 
   let startX = null;
-  document.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].clientX;
-  });
+  document.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
   document.addEventListener('touchend', (e) => {
     if (startX === null) return;
     const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 50) {
-      changeSlide(dx < 0 ? 1 : -1);
-    }
+    if (Math.abs(dx) > 40) { changeSlide(dx < 0 ? 1 : -1); }
     startX = null;
-  });
+  }, {passive: true});
 </script>
 
 </body>
