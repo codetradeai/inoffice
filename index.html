@@ -1,13 +1,3 @@
-Pela captura de tela que você enviou, consegui identificar exatamente o que está acontecendo:
-
-1. **Bug do iOS (Safari):** O iOS contabiliza a barra de endereços no tamanho da tela, empurrando o layout para baixo e "espremendo" o conteúdo.
-2. **Fontes estáticas:** O tamanho do texto não estava encolhendo o suficiente para caber na moldura. Como o conteúdo tem altura flexível e estava centralizado (`justify-content: center`), o texto acabou "vazando" por cima e por baixo da linha roxa.
-
-Para resolver isso de forma definitiva, troquei as medidas para `dvh` (Dynamic Viewport Height - que recalcula o tamanho real da tela no celular ignorando a barra de navegação), usei a função `clamp()` para a fonte diminuir fluidamente, abri mais as margens da moldura e adicionei um limite para o texto não sair do quadrado.
-
-Copie o código completo abaixo, substitua no seu `index.html` e faça um novo *commit* no GitHub:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -442,4 +432,3 @@ Copie o código completo abaixo, substitua no seu `index.html` e faça um novo *
 
 </body>
 </html>
-```
