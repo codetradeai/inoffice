@@ -1,3 +1,8 @@
+Aqui está o código completo, já com todas as regras de responsividade aplicadas na seção `@media (max-width: 900px)`. 
+
+Basta copiar este bloco inteiro, substituir o conteúdo do seu arquivo `index.html` e fazer o *commit* no seu repositório para que o GitHub Pages atualize a versão online.
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +11,6 @@
   <meta name="slides-format" content="viewport">
   <title>Codetrade x inOffice</title>
 
-  <!-- Space Grotesk -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -60,7 +64,7 @@
       transform: scale(1);
       pointer-events: all;
     }
-    /* Canvas 1080x1080 centralizado */
+    /* Canvas centralizado */
     .canvas {
       position: relative;
       width: min(1080px, 90vmin);
@@ -243,22 +247,51 @@
       border-color: rgba(255,255,255,0.35);
     }
 
+    /* ==== INÍCIO DAS REGRAS RESPONSIVAS PARA MOBILE ==== */
     @media (max-width: 900px) {
-      .canvas { width: 100vw; height: 100vw; }
-      .safe { top: 72px; left: 24px; right: 24px; bottom: 96px; }
-      .frame { top: 40px; left: 24px; right: 24px; bottom: 72px; }
-      .corner.tl { top: 40px; left: 24px; }
-      .corner.tr { top: 40px; right: 24px; }
-      .corner.bl { bottom: 72px; left: 24px; }
-      .corner.br { bottom: 72px; right: 24px; }
-      .progress-wrap { left: 24px; right: 24px; bottom: 24px; }
+      /* Muda o canvas para ocupar a tela toda do celular, não apenas um quadrado */
+      .canvas { width: 100vw; height: 100vh; }
+      
+      /* Ajusta margens para dar respiro na tela pequena */
+      .safe { top: 60px; left: 24px; right: 24px; bottom: 80px; }
+      .frame { top: 30px; left: 20px; right: 20px; bottom: 60px; }
+      .corner.tl { top: 30px; left: 20px; }
+      .corner.tr { top: 30px; right: 20px; }
+      .corner.bl { bottom: 60px; left: 20px; }
+      .corner.br { bottom: 60px; right: 20px; }
+      .progress-wrap { left: 24px; right: 24px; bottom: 20px; }
+
+      /* Reduz o tamanho das fontes para não quebrar o layout no celular */
+      .title { font-size: 32px; line-height: 1.2; margin-bottom: 12px; }
+      .subtitle { font-size: 18px; line-height: 1.4; }
+      .body { font-size: 16px; line-height: 1.5; }
+      .list { font-size: 16px; line-height: 1.4; }
+      .tag { font-size: 12px; padding: 4px 14px; }
+      .page { font-size: 14px; }
+      
+      /* Ajusta o rodapé para empilhar as informações */
+      .footer { 
+        font-size: 10px; 
+        flex-direction: column; 
+        gap: 6px; 
+        text-align: center; 
+        padding-top: 12px;
+      }
+      
+      /* Ajusta o botão final do Slide 8 */
+      div[style*="border:1.5px solid"] {
+        font-size: 16px !important;
+        padding: 10px 24px !important;
+        margin-top: 24px !important;
+      }
     }
+    /* ==== FIM DAS REGRAS RESPONSIVAS ==== */
+
   </style>
 </head>
 <body>
 <div class="deck">
 
-  <!-- Slide 1: Gancho -->
   <section class="slide active" data-slide="1">
     <div class="canvas">
       <div class="frame"></div>
@@ -289,7 +322,6 @@
     </div>
   </section>
 
-  <!-- Slide 2: Problema -->
   <section class="slide" data-slide="2">
     <div class="canvas">
       <div class="frame"></div>
@@ -321,7 +353,6 @@
     </div>
   </section>
 
-  <!-- Slide 3: Sobre o inOffice -->
   <section class="slide" data-slide="3">
     <div class="canvas">
       <div class="frame"></div>
@@ -357,7 +388,6 @@
     </div>
   </section>
 
-  <!-- Slide 4: Dores típicas -->
   <section class="slide" data-slide="4">
     <div class="canvas">
       <div class="frame"></div>
@@ -394,7 +424,6 @@
     </div>
   </section>
 
-  <!-- Slide 5: Proposta Codetrade -->
   <section class="slide" data-slide="5">
     <div class="canvas">
       <div class="frame"></div>
@@ -431,7 +460,6 @@
     </div>
   </section>
 
-  <!-- Slide 6: Casos de uso práticos -->
   <section class="slide" data-slide="6">
     <div class="canvas">
       <div class="frame"></div>
@@ -468,7 +496,6 @@
     </div>
   </section>
 
-  <!-- Slide 7: Modelo de piloto -->
   <section class="slide" data-slide="7">
     <div class="canvas">
       <div class="frame"></div>
@@ -505,7 +532,6 @@
     </div>
   </section>
 
-  <!-- Slide 8: CTA -->
   <section class="slide" data-slide="8">
     <div class="canvas">
       <div class="frame"></div>
@@ -594,3 +620,4 @@
 
 </body>
 </html>
+```
